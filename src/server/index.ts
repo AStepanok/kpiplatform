@@ -1,6 +1,9 @@
 import express from 'express';
 
-const server: any = express();
+import initDb from './db/index';
+
+const server = express();
+initDb();
 
 server.get('/', function (req, res) {
 	res.send('Hello World!');

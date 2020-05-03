@@ -14,15 +14,18 @@ module.exports = {
         __filename: false
     },
     externals: [nodeExternals()],
+    resolve: {
+        extensions: ['.ts', '.js']
+    },
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.(js|jsx|mjs|ts|tsx)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: "babel-loader"
                 }
             }
         ]
-    },
+    }
 };

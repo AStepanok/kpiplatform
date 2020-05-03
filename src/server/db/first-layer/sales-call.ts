@@ -1,6 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface SalesCall extends mongoose.Document {
+export type SalesCallType = {
+	managerId: Schema.Types.ObjectId;
+	timestamp: Date;
+	successful: boolean;
+	revenue: number;
+	duration: number;
+};
+
+export interface ISalesCall extends mongoose.Document {
 	managerId: Schema.Types.ObjectId;
 	timestamp: Date;
 	successful: boolean;
@@ -19,4 +27,4 @@ const SalesCallSchema = new Schema({
 	duration: { type: Number, default: 0 }
 });
 
-export const SalesCall = mongoose.model<SalesCall>('SalesCall', SalesCallSchema);
+export const SalesCall = mongoose.model<ISalesCall>('SalesCall', SalesCallSchema);

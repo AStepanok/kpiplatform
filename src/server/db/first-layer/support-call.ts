@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface SupportCall extends mongoose.Document {
+export type SupportCallType = {
 	clientId: Schema.Types.ObjectId;
 	problemId: Schema.Types.ObjectId;
 	managerId: Schema.Types.ObjectId;
@@ -10,8 +10,20 @@ interface SupportCall extends mongoose.Document {
 	wasHandled: boolean;
 	callbackRequest: boolean;
 	techIssuesDuration: number;
-	willRecommend: boolean;
-	satisfied: boolean;
+	duration: number;
+}
+
+export interface ISupportCall extends mongoose.Document {
+	clientId: Schema.Types.ObjectId;
+	problemId: Schema.Types.ObjectId;
+	managerId: Schema.Types.ObjectId;
+	timestamp: Date;
+	clientWereWaiting: boolean;
+	waitingDuration: number;
+	wasHandled: boolean;
+	callbackRequest: boolean;
+	techIssuesDuration: number;
+	duration: number;
 }
 
 const SupportCallSchema = new Schema({
@@ -33,8 +45,7 @@ const SupportCallSchema = new Schema({
 	wasHandled: { type: Boolean, default: false },
 	callbackRequest: { type: Boolean, default: false },
 	techIssuesDuration: { type: Number, default: 0 },
-	willRecommend: { type: Boolean, default: false },
-	satisfied: { type: Boolean, default: false }
+	duration: { type: Number, default: 0 }
 });
 
-export const SupportCall = mongoose.model<SupportCall>('SupportCall', SupportCallSchema);
+export const SupportCall = mongoose.model<ISupportCall>('SupportCall', SupportCallSchema);

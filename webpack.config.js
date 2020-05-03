@@ -1,12 +1,12 @@
-const path = require('path');
-const nodeExternals = require('webpack-node-externals')
+var path = require('path');
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-    entry: './src/server/index.ts',
+    entry: ['@babel/polyfill', './src/server/index.ts'],
     output: {
         publicPath: '/',
         filename: '[name].js',
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'build')
     },
     target: 'node',
     node: {

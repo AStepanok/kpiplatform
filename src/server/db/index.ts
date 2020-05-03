@@ -1,12 +1,197 @@
 import mongoose from 'mongoose';
 
 import {
-	Client
+	ClientType,
+	Client,
+	Manager,
+	IClient,
+	ProblemType,
+	Problem,
+	IProblem,
+	IManager,
+	SupportCallType,
+	SupportCall,
+	AfterSupportCallWorkType,
+	ISupportCall,
+	AfterSupportCallWork,
+	SalesCall, SalesCallType
 } from './first-layer';
+import {
+	getRandomBoolean,
+	getRandomDate,
+	getRandomFromArray,
+	getRandomIntInRange,
+	getRandomNumOfProblems,
+	getRandomNumOfSalesCalls,
+	getRandomNumOfSupportCalls,
+	getRandomProblemStatus,
+	getRandomTechIssuesDuration
+} from '../../utils/random';
 
-export default function () {
-	mongoose.connect('mongodb://localhost:27017/kpi-platform-db');
+function generateClients(count: number) {
+	const clients: ClientType[] = [];
+
+	for (let i = 0; i < count; i++) {
+		const client: ClientType = {
+			hardToWork: getRandomBoolean(0.65),
+			willRecommend: getRandomBoolean(0.5),
+			satisfied: getRandomBoolean(0.4)
+		};
+
+		clients.push(client);
+	}
+
+	return clients;
+}
+
+function generateProblems(clients: IClient[]) {
+	const problems: ProblemType[] = [];
+
+	clients.forEach((client) => {
+		const numOfProblems = getRandomNumOfProblems();
+
+		for (let i = 0; i < numOfProblems; i++) {
+			const problem: ProblemType = {
+				clientId: client._id,
+				status: getRandomProblemStatus(),
+				new: getRandomBoolean(0.3)
+			};
+
+			problems.push(problem);
+		}
+	});
+
+	return problems;
+}
+
+function generateSupportCalls(problems: IProblem[], managers: IManager[]) {
+	const supportCalls: SupportCallType[] = [];
+
+	problems.forEach((problem) => {
+		const numOfSupportCalls = getRandomNumOfSupportCalls();
+
+		for (let i = 0; i < numOfSupportCalls; i++) {
+			const clientWereWaiting = getRandomBoolean(0.6);
+			const waitingDuration = clientWereWaiting ? getRandomIntInRange(1, 180) : 0;
+			const wasHandled = clientWereWaiting ? getRandomBoolean(0.8) : true;
+			const callbackRequest = wasHandled ? false : getRandomBoolean(0.5);
+			const techIssuesDuration = wasHandled ? getRandomTechIssuesDuration() : 0;
+			const duration = wasHandled ? getRandomIntInRange(5, 180) : 0;
+
+			const supportCall: SupportCallType = {
+				clientId: problem.clientId,
+				problemId: problem._id,
+				managerId: getRandomFromArray(managers)._id,
+				timestamp: getRandomDate(new Date(2020, 0, 1), new Date(2020, 0, 7)),
+				clientWereWaiting,
+				waitingDuration,
+				wasHandled,
+				callbackRequest,
+				techIssuesDuration,
+				duration
+			};
+
+			supportCalls.push(supportCall);
+		}
+	});
+
+	return supportCalls;
+}
+
+function generateAfterSupportCallWork(supportCalls: ISupportCall[]) {
+	const afterSupportCallWorks: AfterSupportCallWorkType[] = [];
+
+	supportCalls.forEach((supportCall) => {
+		const duration = supportCall.wasHandled ? getRandomIntInRange(5, 180) : 0;
+
+		const afterSupportCallWork: AfterSupportCallWorkType = {
+			callId: supportCall._id,
+			managerId: supportCall.managerId,
+			problemId: supportCall.problemId,
+			duration
+		};
+
+		afterSupportCallWorks.push(afterSupportCallWork);
+	});
+
+	return afterSupportCallWorks;
+}
+
+function generateSalesCalls(managers: IManager[]) {
+	const salesCalls: SalesCallType[] = [];
+
+	managers.forEach((manager) => {
+		const numOfSalesCalls = getRandomNumOfSalesCalls();
+
+		for (let i = 0; i < numOfSalesCalls; i++) {
+			const successful = getRandomBoolean(0.3);
+			const revenue = successful ? getRandomIntInRange(10, 5000) : 0;
+
+			const salesCall: SalesCallType = {
+				managerId: manager._id,
+				timestamp: getRandomDate(new Date(2020, 0, 1), new Date(2020, 0, 7)),
+				successful,
+				revenue,
+				duration: getRandomIntInRange(5, 180)
+			};
+
+			salesCalls.push(salesCall);
+		}
+	});
+
+	return salesCalls;
+}
+
+function dropCollections() {
+	console.log('dropping collections...');
 
 	Client.collection.drop();
-	Client.create({});
+	Manager.collection.drop();
+	Problem.collection.drop();
+	SupportCall.collection.drop();
+	AfterSupportCallWork.collection.drop();
+	SalesCall.collection.drop();
+
+	console.log('done');
+}
+
+async function fillCollections(numOfClients: number, numOfManagers: number) {
+	console.log('filling collections...');
+
+	console.log('filling clients...');
+	const rawClients = generateClients(numOfClients);
+	const clients = await Client.create(rawClients);
+
+	console.log('filling managers...');
+	const managers = await Manager.create(new Array(numOfManagers).fill({}));
+
+	console.log('filling problems...');
+	const rawProblems = generateProblems(clients);
+	const problems = await Problem.create(rawProblems);
+
+	console.log('filling support calls...');
+	const rawSupportCalls = generateSupportCalls(problems, managers);
+	const supportCalls = await SupportCall.create(rawSupportCalls);
+
+	console.log('filling support call works...');
+	const rawAfterSupportCallWorks = generateAfterSupportCallWork(supportCalls);
+	const afterSupportCallWorks = await AfterSupportCallWork.create(rawAfterSupportCallWorks);
+
+	console.log('filling sales calls...');
+	const rawSalesCalls = generateSalesCalls(managers);
+	const salesCalls = await SalesCall.create(rawSalesCalls);
+
+	console.log(clients.length);
+	console.log(managers.length);
+	console.log(problems.length);
+	console.log(afterSupportCallWorks.length);
+	console.log(supportCalls.length);
+	console.log(salesCalls.length);
+}
+
+export default function (numOfClients: number, numOfManagers: number) {
+	mongoose.connect('mongodb://localhost:27017/kpi-platform-db');
+
+	dropCollections();
+	fillCollections(numOfClients, numOfManagers);
 }

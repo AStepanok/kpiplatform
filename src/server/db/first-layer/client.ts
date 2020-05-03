@@ -1,6 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface Client extends mongoose.Document {
+export type ClientType = {
+	hardToWork: boolean;
+	willRecommend: boolean;
+	satisfied: boolean;
+}
+
+export interface IClient extends mongoose.Document {
 	hardToWork: boolean;
 	willRecommend: boolean;
 	satisfied: boolean;
@@ -12,4 +18,4 @@ const ClientSchema = new Schema({
 	satisfied: { type: Boolean, default: false }
 });
 
-export const Client = mongoose.model<Client>('Client', ClientSchema);
+export const Client = mongoose.model<IClient>('Client', ClientSchema);

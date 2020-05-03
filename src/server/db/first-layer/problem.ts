@@ -1,6 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface Problem extends mongoose.Document {
+export type ProblemType = {
+	clientId: Schema.Types.ObjectId;
+	status: string;
+	new: boolean;
+}
+
+export interface IProblem extends mongoose.Document {
 	clientId: Schema.Types.ObjectId;
 	status: string;
 	new: boolean;
@@ -15,4 +21,4 @@ const ProblemSchema = new Schema({
 	new: { type: Boolean, default: false }
 });
 
-export const Problem = mongoose.model<Problem>('Problem', ProblemSchema);
+export const Problem = mongoose.model<IProblem>('Problem', ProblemSchema);

@@ -3,7 +3,7 @@ import express from 'express';
 import initDb from './db/index';
 
 const server = express();
-initDb();
+initDb(1000, 100);
 
 server.get('/', function (req, res) {
 	res.send('Hello World!');

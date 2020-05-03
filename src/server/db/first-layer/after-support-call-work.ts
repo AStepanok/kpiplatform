@@ -1,6 +1,13 @@
 import mongoose, { Schema } from 'mongoose';
 
-interface AfterSupportCallWork extends mongoose.Document {
+export type AfterSupportCallWorkType = {
+	callId: Schema.Types.ObjectId;
+	problemId: Schema.Types.ObjectId;
+	managerId: Schema.Types.ObjectId;
+	duration: number;
+}
+
+export interface IAfterSupportCallWork extends mongoose.Document {
 	callId: Schema.Types.ObjectId;
 	problemId: Schema.Types.ObjectId;
 	managerId: Schema.Types.ObjectId;
@@ -24,4 +31,4 @@ const AfterSupportCallWorkSchema = new Schema({
 });
 
 export const AfterSupportCallWork =
-	mongoose.model<AfterSupportCallWork>('AfterSupportCallWork', AfterSupportCallWorkSchema);
+	mongoose.model<IAfterSupportCallWork>('AfterSupportCallWork', AfterSupportCallWorkSchema);

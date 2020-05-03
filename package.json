@@ -1,0 +1,44 @@
+{
+  "name": "kpiplatform",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf build && webpack --mode development",
+    "start": "node ./build/main.js",
+    "test": "eslint ./src/ --ext .js,.jsx,.ts,.tsx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AStepanok/kpiplatform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AStepanok/kpiplatform/issues"
+  },
+  "homepage": "https://github.com/AStepanok/kpiplatform#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn test"
+    }
+  },
+  "dependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "babel-loader": "^8.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.19.0",
+    "express": "^4.17.1",
+    "fs": "^0.0.1-security",
+    "husky": "^4.2.5",
+    "net": "^1.0.2",
+    "path": "^0.12.7",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-node-externals": "^1.7.2"
+  }
+}

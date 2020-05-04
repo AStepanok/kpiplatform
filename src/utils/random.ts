@@ -1,4 +1,5 @@
 import { PROBLEM_STATUSES } from './common';
+import {formatDate} from './formatters';
 
 export const getRandomBoolean = (probability: number) => Math.random() >= probability;
 
@@ -37,5 +38,6 @@ export const getRandomIntInRange = (min: number, max: number) => {
 };
 
 export const getRandomDate = (start: Date, end: Date) => {
-	return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+	const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+	return formatDate(date);
 };

@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 export type SalesCallType = {
 	managerId: Schema.Types.ObjectId;
-	timestamp: Date;
+	timestamp: string;
 	successful: boolean;
 	revenue: number;
 	duration: number;
@@ -10,7 +10,7 @@ export type SalesCallType = {
 
 export interface ISalesCall extends mongoose.Document {
 	managerId: Schema.Types.ObjectId;
-	timestamp: Date;
+	timestamp: string;
 	successful: boolean;
 	revenue: number;
 	duration: number;
@@ -21,7 +21,7 @@ const SalesCallSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Manager'
 	},
-	timestamp: { type: Date, default: Date.now() },
+	timestamp: { type: String, default: '' },
 	successful: { type: Boolean, default: false },
 	revenue: { type: Number, default: 0 },
 	duration: { type: Number, default: 0 }

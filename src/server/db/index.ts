@@ -12,4 +12,10 @@ export default async function (numOfClients: number, numOfManagers: number) {
 	const thirdLayerSchemas = await initThirdLayer(secondLayerSchemas, firstLayerSchemas);
 
 	console.log('done :)');
+
+	return {
+		firstLayerSchemas,
+		secondLayerSchemas,
+		thirdLayerSchemas
+	};
 }

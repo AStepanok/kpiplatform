@@ -127,7 +127,7 @@ export const THIRD_LAYER_SCHEMAS = {
 		code: 'FirstCallResolution',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
-				return (schemas.SupportCallsSolvedProblemWithSingleCallCount.find(
+				return (100 * schemas.SupportCallsSolvedProblemWithSingleCallCount.find(
 					(call) => call.timestamp === formattedDate
 				).value / schemas.SupportCallsSolvedProblemCount.find(
 					(call) => call.timestamp === formattedDate
@@ -312,6 +312,26 @@ export const THIRD_LAYER_SCHEMAS = {
 				).value) / schemas.SupportCallsCount.find(
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
+			});
+		}
+	},
+	PeakHourTraffic: {
+		code: 'PeakHourTraffic',
+		generate: (schemas: SchemasType) => {
+			return iterate((formattedDate: string) => {
+				const callsInSameDay = schemas.SalesCallsCount.filter(
+					count => count.timestamp.split(' ')[0] === formattedDate.split(' ')[0]
+				);
+
+				let maximum = 0;
+
+				callsInSameDay.forEach(count => {
+					if (count.value > maximum) {
+						maximum = count.value;
+					}
+				});
+
+				return maximum;
 			});
 		}
 	},

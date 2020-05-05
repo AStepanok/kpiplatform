@@ -10,7 +10,7 @@ export type SecondLayerSchemaType = {
 
 export interface ISecondLayerSchema extends mongoose.Document {
 	timestamp: string;
-	value: number | string;
+	value: number;
 }
 
 const SecondLayerSchema = new Schema({
@@ -123,8 +123,8 @@ export const SECOND_LAYER_SCHEMAS = {
 			});
 		}
 	},
-	SupportCallsWithWaitingLessThanMinuteCount: {
-		code: 'SupportCallsWithWaitingLessThanMinuteCount',
+	CustomerCallsAnsweredInTheFirstMinute: {
+		code: 'CustomerCallsAnsweredInTheFirstMinute',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
 				return schemas.supportCalls.filter((call) =>
@@ -133,8 +133,8 @@ export const SECOND_LAYER_SCHEMAS = {
 			});
 		}
 	},
-	SupportCallsWithCallbackRequestCount: {
-		code: 'SupportCallsWithCallbackRequestCount',
+	CallbackRequests: {
+		code: 'CallbackRequests',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
 				return schemas.supportCalls.filter((call) =>
@@ -153,8 +153,27 @@ export const SECOND_LAYER_SCHEMAS = {
 			});
 		}
 	},
-	SupportCallsNumberToSolveProblemAverage: {
-		code: 'SupportCallsNumberToSolveProblemAverage',
+	SupportCallsSolvedProblemWithSingleCallCount: {
+		code: 'SupportCallsSolvedProblemWithSingleCallCount',
+		generate: (schemas: SchemasType) => {
+			return iterate((formattedDate: string) => {
+				const resolvedCalls = schemas.supportCalls.filter((call) =>
+					(call.timestamp === formattedDate) && call.solvedProblem
+				);
+
+				return resolvedCalls.filter((call) => {
+					const problem = schemas.problems.find(p => p._id === call.problemId);
+
+					const relatedCalls =
+						schemas.supportCalls.filter((relatedCall) => relatedCall.problemId === problem._id);
+
+					return relatedCalls.length === 1;
+				}).length;
+			});
+		}
+	},
+	SupportCallsNumberToSolveProblemCount: {
+		code: 'SupportCallsNumberToSolveProblemCount',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
 				const solvedCalls = schemas.supportCalls.filter((call) =>
@@ -170,7 +189,7 @@ export const SECOND_LAYER_SCHEMAS = {
 					numberOfProblemCalls+=relatedCalls;
 				});
 
-				return numberOfProblemCalls / (solvedCalls.length || 1);
+				return numberOfProblemCalls;
 			});
 		}
 	},
@@ -202,8 +221,8 @@ export const SECOND_LAYER_SCHEMAS = {
 			});
 		}
 	},
-	SupportCallsWithWaitingTimeMaximum: {
-		code: 'SupportCallsWithWaitingTimeMaximum',
+	LongestHoldTime: {
+		code: 'LongestHoldTime',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
 				const clientWereWaitingCalls = schemas.supportCalls.filter((call) =>
@@ -262,6 +281,30 @@ export const SECOND_LAYER_SCHEMAS = {
 			});
 		}
 	},
+	SupportCallsSolvedCallTimeToSolve: {
+		code: 'SupportCallsSolvedCallTimeToSolve',
+		generate: (schemas: SchemasType) => {
+			return iterate((formattedDate: string) => {
+				const solvedCalls = schemas.supportCalls.filter((call) =>
+					(call.timestamp === formattedDate) && call.solvedProblem
+				);
+
+				let totalCallingTime = 0;
+
+				solvedCalls.forEach((solvedCall) => {
+					const relatedCalls = schemas.supportCalls.filter(
+						(call) => call.problemId === solvedCall.problemId
+					);
+
+					relatedCalls.forEach((relatedCall) => {
+						totalCallingTime += relatedCall.duration;
+					});
+				});
+
+				return totalCallingTime;
+			});
+		}
+	},
 	ManagersSalesCallsCountAverage: {
 		code: 'ManagersSalesCallsCountAverage',
 		generate: (schemas: SchemasType) => {
@@ -292,6 +335,16 @@ export const SECOND_LAYER_SCHEMAS = {
 			return iterate((formattedDate: string) => {
 				return schemas.salesCalls.filter(
 					(call) => call.timestamp === formattedDate
+				).length;
+			});
+		}
+	},
+	SalesCallsSuccessfulCount: {
+		code: 'SalesCallsSuccessfulCount',
+		generate: (schemas: SchemasType) => {
+			return iterate((formattedDate: string) => {
+				return schemas.salesCalls.filter(
+					(call) => call.timestamp === formattedDate && call.successful
 				).length;
 			});
 		}

@@ -39,5 +39,8 @@ export const getRandomIntInRange = (min: number, max: number) => {
 
 export const getRandomDate = (start: Date, end: Date) => {
 	const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-	return formatDate(date);
+	return {
+		date,
+		formatted: formatDate(date)
+	};
 };

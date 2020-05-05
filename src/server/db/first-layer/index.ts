@@ -53,6 +53,7 @@ function generateSupportCalls(problems: IProblem[], managers: IManager[]) {
 
 	problems.forEach((problem) => {
 		const numOfSupportCalls = getRandomNumOfSupportCalls();
+		let lastTimeStamp = START_DATE;
 
 		for (let i = 0; i < numOfSupportCalls; i++) {
 			const clientWereWaiting = getRandomBoolean(0.6);
@@ -61,13 +62,15 @@ function generateSupportCalls(problems: IProblem[], managers: IManager[]) {
 			const callbackRequest = wasHandled ? false : getRandomBoolean(0.5);
 			const techIssuesDuration = wasHandled ? getRandomTechIssuesDuration() : 0;
 			const duration = wasHandled ? getRandomIntInRange(5, 180) : 0;
-			const solvedProblem = i + 1 < numOfSupportCalls || problem.status !== 'Solved';
+			const solvedProblem = i + 1 === numOfSupportCalls && problem.status === 'Solved';
+			const timestamp = getRandomDate(lastTimeStamp, END_DATE);
+			lastTimeStamp = timestamp.date;
 
 			const supportCall: SupportCallType = {
 				clientId: problem.clientId,
 				problemId: problem._id,
 				managerId: getRandomFromArray(managers)._id,
-				timestamp: getRandomDate(START_DATE, END_DATE),
+				timestamp: timestamp.formatted,
 				clientWereWaiting,
 				waitingDuration,
 				wasHandled,
@@ -115,7 +118,7 @@ function generateSalesCalls(managers: IManager[]) {
 
 			const salesCall: SalesCallType = {
 				managerId: manager._id,
-				timestamp: getRandomDate(START_DATE, END_DATE),
+				timestamp: getRandomDate(START_DATE, END_DATE).formatted,
 				successful,
 				revenue,
 				duration: getRandomIntInRange(5, 180)

@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "esnext",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "target": "es6",
+        "jsx": "react",
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,

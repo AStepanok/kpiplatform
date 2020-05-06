@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, minimum-scale=1, maximum-scale=1, initial-scale=1, user-scalable=no"
+        />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>{{{ pageTitle }}}</title>
+
+        <%= htmlWebpackPlugin.files.css.map(f => `
+        <link href="${f}" rel="stylesheet" />
+        `).join('') %>
+    </head>
+    <body>
+        <div id="react-app">{{{ content }}}</div>
+        <%= htmlWebpackPlugin.files.js.map(f => `
+        <script type="text/javascript" src="${f}"></script>
+        `).join('') %>
+        <script>
+            window.__main({{{ state }}});
+        </script>
+    </body>
+</html>

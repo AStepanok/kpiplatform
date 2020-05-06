@@ -290,7 +290,7 @@ export const THIRD_LAYER_SCHEMAS = {
 		}
 	},
 	AverageSpeedOfAnswer: {
-		code: 'CallsHandled',
+		code: 'AverageSpeedOfAnswer',
 		generate: (schemas: SchemasType) => {
 			return iterate((formattedDate: string) => {
 				return (schemas.SalesCallsCount.find(

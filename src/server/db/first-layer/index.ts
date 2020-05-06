@@ -17,9 +17,9 @@ function generateClients(count: number) {
 
 	for (let i = 0; i < count; i++) {
 		const client: ClientType = {
-			hardToWork: getRandomBoolean(0.65),
+			hardToWork: getRandomBoolean(0.6),
 			willRecommend: getRandomBoolean(0.5),
-			satisfied: getRandomBoolean(0.4)
+			satisfied: getRandomBoolean(0.6)
 		};
 
 		clients.push(client);
@@ -38,7 +38,7 @@ function generateProblems(clients: IClient[]) {
 			const problem: ProblemType = {
 				clientId: client._id,
 				status: getRandomProblemStatus(),
-				new: getRandomBoolean(0.3)
+				new: getRandomBoolean(0.5)
 			};
 
 			problems.push(problem);
@@ -56,9 +56,9 @@ function generateSupportCalls(problems: IProblem[], managers: IManager[]) {
 		let lastTimeStamp = START_DATE;
 
 		for (let i = 0; i < numOfSupportCalls; i++) {
-			const clientWereWaiting = getRandomBoolean(0.6);
+			const clientWereWaiting = getRandomBoolean(0.4);
 			const waitingDuration = clientWereWaiting ? getRandomIntInRange(1, 180) : 0;
-			const wasHandled = clientWereWaiting ? getRandomBoolean(0.8) : true;
+			const wasHandled = clientWereWaiting ? getRandomBoolean(0.3) : true;
 			const callbackRequest = wasHandled ? false : getRandomBoolean(0.5);
 			const techIssuesDuration = wasHandled ? getRandomTechIssuesDuration() : 0;
 			const duration = wasHandled ? getRandomIntInRange(5, 180) : 0;
@@ -113,7 +113,7 @@ function generateSalesCalls(managers: IManager[]) {
 		const numOfSalesCalls = getRandomNumOfSalesCalls();
 
 		for (let i = 0; i < numOfSalesCalls; i++) {
-			const successful = getRandomBoolean(0.3);
+			const successful = getRandomBoolean(0.7);
 			const revenue = successful ? getRandomIntInRange(10, 5000) : 0;
 
 			const salesCall: SalesCallType = {

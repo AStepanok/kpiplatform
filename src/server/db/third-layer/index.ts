@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import {formatDate} from '../../../utils/formatters';
 import {END_DATE, START_DATE} from '../../../utils/common';
 import { ISecondLayerSchema } from '../second-layer';
+import { KPI } from './kpi';
 
 export type ThirdLayerSchemaType = {
 	timestamp: string;
@@ -22,27 +23,50 @@ export const makeThirdLayerModel = (modelName: string) =>
 	mongoose.model<IThirdLayerSchema>(modelName, ThirdLayerSchema);
 
 export const fillThirdLayerSchemas = async (secondLayerSchemas: SchemasType, firstLayerSchemas: any) => {
-	try {
-		console.log('filling third layer schemas...');
-		const thirdLayerSchemas: any = {};
-		for (let key of Object.keys(THIRD_LAYER_SCHEMAS)) {
-			// @ts-ignore
-			console.log(`filling: ${THIRD_LAYER_SCHEMAS[key].code}`);
-			// @ts-ignore
-			const raw = THIRD_LAYER_SCHEMAS[key].generate(secondLayerSchemas, firstLayerSchemas);
-			// @ts-ignore
-			const result = await makeThirdLayerModel(THIRD_LAYER_SCHEMAS[key].code).create(raw);
 
-			// @ts-ignore
-			thirdLayerSchemas[THIRD_LAYER_SCHEMAS[key].code] = result;
-		}
+	console.log('filling third layer schemas...');
+	const thirdLayerSchemas: any = {};
+	for (let key of Object.keys(THIRD_LAYER_SCHEMAS)) {
+		// @ts-ignore
+		console.log(`filling: ${THIRD_LAYER_SCHEMAS[key].code}`);
+		// @ts-ignore
+		const raw = THIRD_LAYER_SCHEMAS[key].generate(secondLayerSchemas, firstLayerSchemas);
+		// @ts-ignore
+		const result = await makeThirdLayerModel(THIRD_LAYER_SCHEMAS[key].code).create(raw);
 
-		return thirdLayerSchemas;
-	} catch (e) {
-		console.error(e);
-
-		return 1;
+		// @ts-ignore
+		thirdLayerSchemas[THIRD_LAYER_SCHEMAS[key].code] = result;
 	}
+	const kpis = Object.keys(thirdLayerSchemas).reduce((KPI, key) => {
+		return [ ...KPI, {
+			// @ts-ignore
+			code: THIRD_LAYER_SCHEMAS[key].code,
+			// @ts-ignore
+			linkedKPICodes: THIRD_LAYER_SCHEMAS[key].linkedKPICodes,
+			// @ts-ignore
+			rootKPI: THIRD_LAYER_SCHEMAS[key].rootKPI
+		}];
+	}, []);
+
+	kpis.push({
+		code: 'NetPromoterScore',
+		linkedKPICodes: ['CustomerSatisfaction'],
+		rootKPI: ''
+	});
+	kpis.push({
+		code: 'CustomerSatisfaction',
+		linkedKPICodes: ['CallResolutionRate', 'CustomerEffortScore'],
+		rootKPI: 'NetPromoterScore'
+	});
+	kpis.push({
+		code: 'CustomerEffortScore',
+		linkedKPICodes: ['NumberOfCallsPerQuery', 'AverageCallLength', 'CallAbandonedRate'],
+		rootKPI: 'CustomerSatisfaction'
+	});
+	// console.log(KPI.find({}))
+	thirdLayerSchemas.KPI = await KPI.create(kpis);
+
+	return thirdLayerSchemas;
 };
 
 function iterate(getValue: Function) {
@@ -109,7 +133,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		linkedKPICodes: ['AverageAgeOfQuery'],
+		rootKPI: 'CustomerSatisfaction',
 	},
 	AverageAgeOfQuery: {
 		code: 'AverageAgeOfQuery',
@@ -121,7 +147,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		linkedKPICodes: ['FirstCallResolution', 'AfterCallWorkTime', 'NumberOfCallsPerQuery'],
+		rootKPI: 'CallResolutionRate'
 	},
 	FirstCallResolution: {
 		code: 'FirstCallResolution',
@@ -133,7 +161,8 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'AverageAgeOfQuery',
 	},
 	AfterCallWorkTime: {
 		code: 'AfterCallWorkTime',
@@ -147,7 +176,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		linkedKPICodes: ['TimeLostDueTechnologiesIssues'],
+		rootKPI: 'AverageAgeOfQuery'
 	},
 	TimeLostDueTechnologiesIssues: {
 		code: 'TimeLostDueTechnologiesIssues',
@@ -159,7 +190,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'AfterCallWorkTime',
+		format: (value: number) => `${value}sec.`
 	},
 	NumberOfCallsPerQuery: {
 		code: 'NumberOfCallsPerQuery',
@@ -171,7 +204,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'AverageAgeOfQuery',
+		format: (value: number) => `${value} calls`
 	},
 	CallAbandonedRate: {
 		code: 'CallAbandonedRate',
@@ -185,7 +220,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'CustomerEffortScore',
+		linkedKPICodes: ['CallbackRequests', 'FirstResponseTime'],
 	},
 	AverageCallLength: {
 		code: 'AverageCallLength',
@@ -197,7 +234,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'CustomerEffortScore',
+		linkedKPICodes: ['TimeLostDueTechnologiesIssues'],
 	},
 	FirstResponseTime: {
 		code: 'FirstResponseTime',
@@ -209,7 +248,9 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'CallAbandonedRate',
+		linkedKPICodes: ['LongestHoldTime', 'CustomerCallsAnsweredInTheFirstMinute', 'TimeLostDueTechnologiesIssues'],
 	},
 	PercentageOfCallsBlocked: {
 		code: 'PercentageOfCallsBlocked',
@@ -221,7 +262,8 @@ export const THIRD_LAYER_SCHEMAS = {
 					(call) => call.timestamp === formattedDate
 				).value) || 0;
 			});
-		}
+		},
+		rootKPI: 'CallbackRequests'
 	},
 	ProfitPerCall: {
 		code: 'ProfitPerCall',
@@ -341,6 +383,7 @@ function dropThirdLayerSchemas() {
 	Object.keys(THIRD_LAYER_SCHEMAS).forEach(async (key: keyof typeof THIRD_LAYER_SCHEMAS) => {
 		await makeThirdLayerModel(THIRD_LAYER_SCHEMAS[key].code).collection.drop();
 	});
+	KPI.collection.drop();
 }
 
 export default (schemas: SchemasType, firstLayerSchemas: any) => {

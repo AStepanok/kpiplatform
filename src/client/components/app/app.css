@@ -4,3 +4,29 @@
     display: block;
     margin: auto;
 }
+
+p, h3, button {
+    font-family: "Gill Sans", "Gill Sans MT", Ser­avek, "Trebuchet MS", sans-serif;
+    text-align: center;
+}
+
+p {
+    font-size: 32px;
+}
+
+h3 {
+    margin: 20px 0;
+    font-size: 28px;
+    font-weight: 400;
+}
+
+button {
+    margin: 40px auto;
+    background-color: rgb(69, 90, 100);
+    outline: none;
+    font-weight: 700;
+    color: white;
+    font-size: 20px;
+    padding: 20px 40px;
+    display: block;
+}

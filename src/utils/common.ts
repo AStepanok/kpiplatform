@@ -10,3 +10,21 @@ export const PROBLEM_STATUSES = [
 	'Solved',
 	'Failed'
 ];
+
+export const FORMAT_SCHEMAS_Y_AXIS = [
+	{
+		codes: ['CallResolutionRate', 'FirstCallResolution', 'CallAbandonedRate'],
+		format: (value: number) => `${value}%`
+	},
+	{
+		codes: ['AverageAgeOfQuery', 'AfterCallWorkTime', 'TimeLostDueTechnologiesIssues', 'AverageCallLength'],
+		format: (value: number) => `${value}sec.`
+	},
+	{
+		codes: ['NumberOfCallsPerQuery'],
+		format: (value: number) => `${value} calls`
+	}
+];
+
+
+const rootkpis = ['NetPromoterScore', 'ProfitPerCall', 'Repeat Issues', 'Peak Hour Traffic'];

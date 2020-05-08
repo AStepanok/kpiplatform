@@ -17,5 +17,5 @@ Object.keys(routes).forEach((routeKey: keyof typeof routes) => {
 server.listen(3000, async function () {
 	console.log('Example server listening on port 3000!');
 
-	schemas = await initDb(1, 1);
+	schemas = await initDb(10, 10);
 });

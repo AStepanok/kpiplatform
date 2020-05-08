@@ -27,10 +27,13 @@ router.get('*', function (req, res) {
 		);
 	}
 
-	const reactComp = renderToString(<App schemas={ schemas }/>);
+	const reactComp = renderToString(<App kpi={schemas.thirdLayerSchemas.KPI } schemas={ schemas.thirdLayerSchemas }/>);
 	const htmlToSend = template({
 		content: reactComp,
-		state: JSON.stringify(schemas)
+		state: JSON.stringify({
+			kpi: schemas.thirdLayerSchemas.KPI,
+			schemas: schemas.thirdLayerSchemas
+		})
 	});
 	res.send(htmlToSend);
 });

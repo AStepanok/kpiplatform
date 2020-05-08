@@ -141,7 +141,8 @@ export const SECOND_LAYER_SCHEMAS = {
 					(call.timestamp === formattedDate) && call.callbackRequest
 				).length;
 			});
-		}
+		},
+		linkedKPICodes: ['LongestHoldTime', 'CustomerCallsAnsweredInTheFirstMinute', 'TimeLostDueTechnologiesIssues'],
 	},
 	SupportCallsSolvedProblemCount: {
 		code: 'SupportCallsSolvedProblemCount',
